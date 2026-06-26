@@ -178,21 +178,89 @@
       <!-- Sostituisci L'URL in 'action' con il tuo link Formspree -->
       <form action="https://formspree.io/f/xrewqyyv" method="POST">
     
-        <label for="guestName">Inserisci il tuo Nome e cognome</label>
-        <input type="text" id="guestName" name="guestName" placeholder="Es. Maria Rossi" required />
+        <label for="Nome">Inserisci il tuo Nome e cognome</label>
+        <input type="text" id="Nome" name="Nome" placeholder="Es. Francesco Baison" required />
 
-        <label for="guestCount">Numero di persone</label>
-        <input type="number" id="guestCount" name="guestCount" min="1" max="10" value="1" required />
+        
+        <label for="NumAdulti">Numero di adulti</label>
+        <input type="number" id="NumAdulti" name="NumAdulti" min="0" max="10" value="0" required />
 
-          <label for="diet">Esigenze alimentari</label>
-          <select id="diet" name="diet">
-            <option value="">Nessuna</option>
-            <option value="vegetariano">Vegetariano</option>
-            <option value="vegano">Vegano</option>
-            <option value="senza-glutine">Senza glutine</option>
-            <option value="altro">Altro (specificare)</option>
-          </select>
-          <input type="text" id="dietOther" name="dietOther" placeholder="Specificare esigenze alimentari" />
+        <label for="NumBambini">Numero di bambini (per mangiare il menù bambino)</label>
+        <input type="number" id="NumBambini" name="NumBambini" min="0" max="5" value="0" required />
+
+        <div class="form-container">
+        
+    
+        <div class="dropdown-custom">
+          <label>Seleziona le tue esigenze alimentari:</label>
+          <div class="dropdown-button" id="dropdownBtn" onclick="toggleDropdown()">Scegli opzioni...</div>
+        
+          <div class="dropdown-content" id="dropdownVoci">
+              <label><input type="checkbox" value="Nessuna" onchange="aggiornaSelezione(this)"> Nessuna</label>
+              <label><input type="checkbox" value="Vegetariano" onchange="aggiornaSelezione(this)"> Vegetariano</label>
+              <label><input type="checkbox" value="Vegano" onchange="aggiornaSelezione(this)"> Vegano</label>
+              <label><input type="checkbox" value="Senza glutine" onchange="aggiornaSelezione(this)"> Senza glutine</label>
+              <label><input type="checkbox" value="Senza lattosio" onchange="aggiornaSelezione(this)"> Senza lattosio</label>
+              <label><input type="checkbox" value="Altro" id="checkAltro" onchange="aggiornaSelezione(this)"> Altro (specificare)</label>
+          </div>
+        </div>
+
+    <div id="campo-altro">
+        <label for="specifica-altro">Specifica qui:</label>
+        <input type="text" id="specifica-altro" placeholder="Es. allergia alle fragole, crostacei...">
+    </div>
+</div>
+
+<script>
+    // Apri e chiudi il menu a tendina al click
+    function toggleDropdown() {
+        document.getElementById("dropdownVoci").classList.toggle("show");
+    }
+
+    // Gestisci la selezione delle opzioni e la comparsa di "Altro"
+    function aggiornaSelezione() {
+        const checkboxes = document.querySelectorAll('.dropdown-content input[type="checkbox"]');
+        const btn = document.getElementById("dropdownBtn");
+        const campoAltro = document.getElementById("campo-altro");
+        const checkAltro = document.getElementById("checkAltro");
+        
+        let scelte = [];
+        
+        checkboxes.forEach(box => {
+            if (box.checked) {
+                scelte.push(box.value);
+            }
+        });
+
+        // Aggiorna il testo del bottone principale
+        if (scelte.length > 0) {
+            btn.innerText = scelte.join(", ");
+        } else {
+            btn.innerText = "Scegli opzioni...";
+        }
+
+        // Mostra o nasconde il campo "Altro"
+        if (checkAltro.checked) {
+            campoAltro.style.display = "block";
+        } else {
+            campoAltro.style.display = "none";
+            document.getElementById("specifica-altro").value = ""; // Svuota se deselezionato
+        }
+    }
+
+    // Chiudi il menu se l'utente clicca fuori dal dropdown
+    window.onclick = function(event) {
+        if (!event.target.matches('.dropdown-button') && !event.target.closest('.dropdown-content')) {
+            const dropdowns = document.getElementsByClassName("dropdown-content");
+            for (let i = 0; i < dropdowns.length; i++) {
+                let openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+</script>
 
           <label for="message">Messaggio</label>
           <textarea id="message" name="message" rows="4" placeholder="Ci vediamo presto!"></textarea>
@@ -212,15 +280,39 @@
         <p>La tua presenza sarà il regalo più grande! Da tempo sognamo di vivere il momento del nostro matrimonio circondati dalle nostre famiglie e dalle persone a noi più care. Dedicarci l'intera giornata per celebrare e festeggiare insime a noi è davvero il più bel gesto di affetto e amicizia!
           Per chi avesse piacere a lasciarci un pensiero, saremo contenti e grati di destinarlo al nostro primo viaggio da marito e moglie. Grazie!  </p>
         <div class="iban-box">
-          <div class="iban-label">IBAN</div>
-          <div class="iban-value" id="ibanValue">Mantia Laura IT49L0845332800000000190874</div>
+          <div class="iban-label">IBAN Laura Mantia</div>
+          <input type="text" id="ibanCampo" class="iban-input" value="IT49L0845332800000000190874" readonly>
+          
         </div>
         <div style="margin-top:0.75rem; display:flex; gap:.75rem; align-items:center;">
-          <button id="copyIban" class="button">Copia IBAN</button>
+          <button id="copyIban" class="button" onclick="copiaIlTesto()">Copia IBAN</button>
           <span id="copyStatus" class="status"></span>
         </div>
-        <p>Se vuoi, lasciaci una dedica!</p>
       </div>
+
+      <script>
+      function copiaIlTesto() {
+        // 1. Selezioniamo il campo di testo dell'IBAN
+        const copiaTesto = document.getElementById("ibanCampo");
+              const tasto = document.getElementById("copyIban");
+
+              // 2. Usiamo l'API degli appunti per copiare il testo del valore
+              navigator.clipboard.writeText(copiaTesto.value).then(() => {
+                  // 3. Feedback visivo: cambiamo il testo del tasto
+                  tasto.innerText = "Copiato!";
+                  tasto.style.backgroundColor = "#1d635a"; // Diventa leggermente più scuro
+
+                  // 4. Dopo 2 secondi il tasto torna allo stato originale
+                  setTimeout(() => {
+                      tasto.innerText = "Copia IBAN";
+                      tasto.style.backgroundColor = "#2a9d8f";
+                  }, 2000);
+              }).catch(err => {
+                  // Gestione errore nel caso il browser non supporti l'azione
+                  alert("Ops, non è stato possibile copiare l'IBAN automaticamente.");
+              });
+      }
+      </script>
     </section>
 
     <section class="section music" id="songRequest">
@@ -228,7 +320,7 @@
         <h2>Canti-amo</h2>
         <p>Quale canzone vuoi cantare o ballare con noi?</p>
       </div>
-      <form id="songForm">
+      <form action="https://formspree.io/f/mojodkbn" method="POST">
         <label for="songName">Titolo della canzone</label>
         <input type="text" id="songName" name="songName" placeholder="Es. Una canzone speciale" required />
 
